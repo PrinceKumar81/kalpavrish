@@ -10,7 +10,7 @@ struct Student
     float average;
     char grade;
 };
-
+ 
 int studentCount = 0;
 
 int calculateTotal(int marks[]);
@@ -54,12 +54,12 @@ void processStudents()
         do
         {
             printf("Enter roll number  ");
-            scanf("%d",&students[i].rollNo);
-             if (students[i].rollNo <= 0)
+            scanf("%d", &students[i].rollNo);
+            if (students[i].rollNo <= 0)
             {
                 printf("  Invalid Roll Number! Please enter a positive number.\n");
             }
-        }while(students[i].rollNo<=0);
+        } while (students[i].rollNo <= 0);
 
         printf("Enter Name: ");
         scanf(" %[^\n]s", students[i].name);
