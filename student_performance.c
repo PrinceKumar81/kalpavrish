@@ -50,16 +50,28 @@ void processStudents()
     for (i = 0; i < n; i++)
     {
         printf("\n--- Student %d ---\n", i + 1);
-
+        int rollduplicate;
         do
         {
+            rollduplicate=0;
             printf("Enter roll number  ");
             scanf("%d", &students[i].rollNo);
             if (students[i].rollNo <= 0)
             {
                 printf("  Invalid Roll Number! Please enter a positive number.\n");
+                rollduplicate=1;
+                continue;
             }
-        } while (students[i].rollNo <= 0);
+            for(int k=0;k<i;k++)
+            {
+                if (students[i].rollNo == students[k].rollNo)
+                {
+                    printf("  Roll Number already exists\n");
+                    rollduplicate = 1;
+                    break;
+                }
+            }
+        } while (rollduplicate);
 
         printf("Enter Name: ");
         scanf(" %[^\n]s", students[i].name);
