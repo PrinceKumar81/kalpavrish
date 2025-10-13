@@ -107,7 +107,7 @@ void processStudents()
         {
             printf("\n--- Student %d ---\n", i + 1);
             printf("Roll Number: ");
-            printRollNumberRecursive(students[i].rollNo, 1);
+            //printRollNumberRecursive(students[i].rollNo, 1);
             printf("\nName: %s\n", students[i].name);
             printf("Total Marks: %d/300\n", students[i].total);
             printf("Average: %.2f%%\n", students[i].average);
@@ -117,6 +117,12 @@ void processStudents()
 
         displayStudentInfo(students[i]);
     }
+    // printf("list of rollNo via Recursion");
+    // for (i = 0; i < n; i++)
+    // {
+    //     printRollRecursively(students[i].rollNo, 1);
+    //     printf(" ");
+    // }
 }
 
 int calculateTotal(int marks[])
@@ -224,17 +230,20 @@ void displayStars(char grade)
     printf("\n");
 }
 
-void printRollNumberRecursive(int rollNo, int digit)
+void printRollRecursively(int rollNo, int digit)
 {
-
-    if (rollNo == 0)
+    if(rollNo<0)
     {
+        printf("Negative rollNot is not allowed");
         return;
     }
-
-    printRollNumberRecursive(rollNo / 10, digit + 1);
-
-    printf("%d", rollNo % 10);
+    if(rollNo==0)
+    {
+        printf("You have entered zero,it is not allowed");
+        return;
+    }
+    printRollRecursively(rollNo/10,digit+1);
+    printf("%d",rollNo%10);
 }
 
 void displayStudentInfo(struct Student s)
@@ -242,7 +251,7 @@ void displayStudentInfo(struct Student s)
     printf("\n--- Performance Report ---\n");
 
     printf("Roll Number: ");
-    printRollNumberRecursive(s.rollNo, 1);
+    //printRollNumberRecursive(s.rollNo, 1);
     printf("\n");
 
     printf("Name: %s\n", s.name);
