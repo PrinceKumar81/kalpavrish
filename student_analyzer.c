@@ -10,43 +10,29 @@ struct Student
     float average;
     char grade;
 };
- 
-int studentCount = 0;
-
 int calculateTotal(int marks[]);
 float calculateAverage(int total);
 char assignGrade(float average);
 void displayStars(char grade);
-void printRollNumberRecursive(int rollNo, int digit);
 void displayStudentInfo(struct Student s);
 void processStudents();
-
 int main()
 {
     printf("   STUDENT PERFORMANCE ANALYZER\n");
-
     processStudents();
-
-    printf("Total students processed: %d\n", studentCount);
-
     return 0;
 }
-
 void processStudents()
 {
     int n, i;
-
     printf("Enter the number of students (1-100): ");
     scanf("%d", &n);
-
     if (n < 1 || n > 100)
     {
         printf("Invalid input! Number of students must be between 1 and 100.\n");
         return;
     }
-
     struct Student students[n];
-
     for (i = 0; i < n; i++)
     {
         printf("\n--- Student %d ---\n", i + 1);
@@ -94,15 +80,24 @@ void processStudents()
         students[i].total = calculateTotal(students[i].marks);
         students[i].average = calculateAverage(students[i].total);
         students[i].grade = assignGrade(students[i].average);
-
-        studentCount++;
     }
-
+    for(int i=0;i<n-1;i++)
+    {
+        for(int j=i+1;j<n;j++)
+        {
+            if(students[i].rollNo>students[j].rollNo)
+            {
+                struct  Student temp = students[i];
+                {
+                    students[i] = students[j];
+                    students[j] = temp;
+                }
+            }
+        }
+    }
     printf("       PERFORMANCE REPORT     \n");
-
     for (i = 0; i < n; i++)
     {
-
         if (students[i].average < 35)
         {
             printf("\n--- Student %d ---\n", i + 1);
@@ -113,18 +108,13 @@ void processStudents()
             printf("Grade: %c\n", students[i].grade);
             printf("Status: FAIL\n");
         }
-
         displayStudentInfo(students[i]);
     }
 }
-
 int calculateTotal(int marks[])
 {
-
     int sum = 0;
-
     sum = marks[0] + marks[1] + marks[2];
-
     return sum;
 }
 
@@ -133,7 +123,6 @@ float calculateAverage(int total)
 
     return (float)total / 3;
 }
-
 char assignGrade(float average)
 {
     char grade;
@@ -158,45 +147,11 @@ char assignGrade(float average)
     {
         grade = 'F';
     }
-
     return grade;
 }
-
-char assignGradeSwitch(float average)
-{
-    int avg = (int)average / 10;
-    char grade;
-
-    switch (avg)
-    {
-    case 10:
-    case 9:
-    case 8:
-        grade = 'A';
-        break;
-    case 7:
-        grade = 'B';
-        break;
-    case 6:
-    case 5:
-        grade = 'C';
-        break;
-    case 4:
-    case 3:
-        grade = 'D';
-        break;
-    default:
-        grade = 'F';
-        break;
-    }
-
-    return grade;
-}
-
 void displayStars(char grade)
 {
     int starCount;
-
     switch (grade)
     {
     case 'A':
@@ -215,14 +170,12 @@ void displayStars(char grade)
         starCount = 0;
         break;
     }
-
     for (int i = 0; i < starCount; i++)
     {
         printf("* ");
     }
     printf("\n");
 }
-
 void printRollRecursively(int rollNo, int digit)
 {
     if(rollNo<0)
@@ -230,29 +183,27 @@ void printRollRecursively(int rollNo, int digit)
         printf("Negative rollNot is not allowed");
         return;
     }
-    if(rollNo==0)
+    if(rollNo==0 && digit == 0)
     {
         printf("You have entered zero,it is not allowed");
         return;
     }
+    if(rollNo==0) return;
     printRollRecursively(rollNo/10,digit+1);
     printf("%d",rollNo%10);
 }
-
 void displayStudentInfo(struct Student s)
 {
     printf("\n--- Performance Report ---\n");
-
     printf("Roll Number: ");
+    printRollRecursively(s.rollNo, 0);
     printf("\n");
-
     printf("Name: %s\n", s.name);
     printf("Marks: Subject 1: %d | Subject 2: %d | Subject 3: %d\n",
            s.marks[0], s.marks[1], s.marks[2]);
     printf("Total Marks: %d/300\n", s.total);
     printf("Average: %.2f%%\n", s.average);
     printf("Grade: %c\n", s.grade);
-
     if (s.grade != 'F')
     {
         displayStars(s.grade);
