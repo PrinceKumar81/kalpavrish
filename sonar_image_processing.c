@@ -52,39 +52,32 @@ void rotateMatrix90Clockwise(int **matrix, int n) {
     reverseRows(matrix, n);
 }
 void applySmoothingFilter(int **matrix, int n) {
-    int **temp = (int **)malloc(n * sizeof(int *));
-    for (int i = 0; i < n; i++) {
-        *(temp + i) = (int *)malloc(n * sizeof(int));
-    }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            int sum = 0;
-            int count = 0;
-            for (int di = -1; di <= 1; di++) {
-                for (int dj = -1; dj <= 1; dj++) {
-                    int ni = i + di;
-                    int nj = j + dj;
-                    if (ni >= 0 && ni < n && nj >= 0 && nj < n) {
-                        int *ptr = (*(matrix + ni) + nj);
-                        sum += *ptr;
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<n;j++)
+        {
+            int sum=0;
+            int count=0;
+
+            for(int di=-1;di<=1;di++)
+            {
+                for(int dj=-1;dj<=1;dj++)
+                {
+                    int ni=i+di;
+                    int nj=j+dj;
+                    if(ni>=0&&ni<n&&nj>=0&&nj<n)
+                    {
+                        int val =*(*(matrix+ni)+nj)&0xFF;
+                        sum+=val;
                         count++;
                     }
                 }
             }
-            *(*(temp + i) + j) = sum / count;
+            int newVal = sum/count;
+            *(*(matrix+i)+j)|=(newVal<<8);
         }
     }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            *(*(matrix + i) + j) = *(*(temp + i) + j);
-        }
-    }
-    for (int i = 0; i < n; i++) {
-        free(*(temp + i));
-    }
-    free(temp);
 }
-
 int main() {
     int n;
     printf("  SONAR IMAGE PROCESSING SYSTEM\n");
