@@ -3,26 +3,26 @@
 #include <time.h>
 void generateMatrix(int **matrix, int n) {
     srand(time(NULL));
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            *(*(matrix + i) + j) = rand() % 256;
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            *(*(matrix + row) + col) = rand() % 256;
         }
     }
 }
 void displayMatrix(int **matrix, int n, const char *title) {
     printf("\n%s:\n", title);
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            printf("%4d ", *(*(matrix + i) + j));
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            printf("%4d ", *(*(matrix + row) + col));
         }
         printf("\n");
     }
 }
 void transposeMatrix(int **matrix, int n) {
-    for (int i = 0; i < n; i++) {
-        for (int j = i + 1; j < n; j++) {
-            int *ptr1 = (*(matrix + i) + j);
-            int *ptr2 = (*(matrix + j) + i);
+    for (int row = 0; row< n; row++) {
+        for (int col = row + 1; col < n; col++) {
+            int *ptr1 = (*(matrix + row) + col);
+            int *ptr2 = (*(matrix + col) + row);
             int temp = *ptr1;
             *ptr1 = *ptr2;
             *ptr2 = temp;
@@ -52,29 +52,29 @@ void rotateMatrix90Clockwise(int **matrix, int n) {
     reverseRows(matrix, n);
 }
 void applySmoothingFilter(int **matrix, int n) {
-    for(int i=0;i<n;i++)
+    for(int row=0;row<n;row++)
     {
-        for(int j=0;j<n;j++)
+        for(int col=0;col<n;col++)
         {
             int sum=0;
             int count=0;
 
-            for(int di=-1;di<=1;di++)
+            for(int rowoffset=-1;rowoffset<=1;rowoffset++)
             {
-                for(int dj=-1;dj<=1;dj++)
+                for(int coloffset=-1;coloffset<=1;coloffset++)
                 {
-                    int ni=i+di;
-                    int nj=j+dj;
-                    if(ni>=0&&ni<n&&nj>=0&&nj<n)
+                    int neighborRow =row+rowoffset;
+                    int neighborCol =col+coloffset;
+                    if(neighborRow>=0&&neighborRow<n&&neighborCol>=0&&neighborCol<n)
                     {
-                        int val =*(*(matrix+ni)+nj)&0xFF;
+                        int val =*(*(matrix+neighborRow)+neighborCol)&0xFF;
                         sum+=val;
                         count++;
                     }
                 }
             }
             int newVal = sum/count;
-            *(*(matrix+i)+j)|=(newVal<<8);
+            *(*(matrix+row)+col)|=(newVal<<8);
         }
     }
 }
