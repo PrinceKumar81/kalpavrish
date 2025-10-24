@@ -5,7 +5,7 @@ void generateMatrix(int **matrix, int n) {
     srand(time(NULL));
     for (int row = 0; row < n; row++) {
         for (int col = 0; col < n; col++) {
-            *(*(matrix + row) + col) = rand() % 256;
+            *(*(matrix + row) + col) = (rand() % 256);
         }
     }
 }
@@ -21,11 +21,11 @@ void displayMatrix(int **matrix, int n, const char *title) {
 void transposeMatrix(int **matrix, int n) {
     for (int row = 0; row< n; row++) {
         for (int col = row + 1; col < n; col++) {
-            int *ptr1 = (*(matrix + row) + col);
-            int *ptr2 = (*(matrix + col) + row);
-            int temp = *ptr1;
-            *ptr1 = *ptr2;
-            *ptr2 = temp;
+            int *ptr1 = *(matrix + row) + col;
+            int *ptr2 = *(matrix + col) + row;
+            int *temp = ptr1;
+            ptr1 = ptr2;
+            ptr2 = temp;
         }
     }
 }
@@ -52,13 +52,13 @@ void rotateMatrix90Clockwise(int **matrix, int n) {
     reverseRows(matrix, n);
 }
 void applySmoothingFilter(int **matrix, int n) {
+    int *tempRow = (int *)malloc(n*sizeof(int));
     for(int row=0;row<n;row++)
     {
         for(int col=0;col<n;col++)
         {
             int sum=0;
             int count=0;
-
             for(int rowoffset=-1;rowoffset<=1;rowoffset++)
             {
                 for(int coloffset=-1;coloffset<=1;coloffset++)
@@ -67,16 +67,19 @@ void applySmoothingFilter(int **matrix, int n) {
                     int neighborCol =col+coloffset;
                     if(neighborRow>=0&&neighborRow<n&&neighborCol>=0&&neighborCol<n)
                     {
-                        int val =*(*(matrix+neighborRow)+neighborCol)&0xFF;
-                        sum+=val;
+                        sum+=*(*(matrix+neighborRow)+neighborCol);
                         count++;
                     }
                 }
             }
-            int newVal = sum/count;
-            *(*(matrix+row)+col)|=(newVal<<8);
+           *(tempRow+col) = sum/count;
         }
+    for(int col = 0;col<n;col++)
+    {
+       *(*(matrix+row)+col) = *(tempRow+col);
     }
+    }
+    free(tempRow);
 }
 int main() {
     int n;
