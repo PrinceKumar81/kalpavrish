@@ -29,55 +29,55 @@ void transposeMatrix(int **matrix, int n) {
 }
 void reverseRows(int **matrix, int n) {
     for (int i = 0; i < n; i++) {
-        int *left = *(matrix + i); 
+        int *left = *(matrix + i);
         int *right = *(matrix + i) + (n - 1);
         while (left < right) {
             int temp = *left;
             *left = *right;
             *right = temp;
-            
             left++;
             right--;
         }
     }
 }
 void rotateMatrix90Clockwise(int **matrix, int n) {
-    printf("\n Performing 90 Clockwise Rotation\n");
-    printf("Transpose the matrix\n");
+    printf("\nPerforming 90 Clockwise Rotation...");
+    printf("\nStep 1: Transpose the matrix");
     transposeMatrix(matrix, n);
     displayMatrix(matrix, n, "After Transpose");
-    printf("Step 2: Reverse each row\n");
+    printf("\nStep 2: Reverse each row");
     reverseRows(matrix, n);
 }
 void applySmoothingFilter(int **matrix, int n) {
-    int *tempRow = (int *)malloc(n*sizeof(int));
-    for(int row=0;row<n;row++)
-    {
-        for(int col=0;col<n;col++)
-        {
-            int sum=0;
-            int count=0;
-            for(int rowoffset=-1;rowoffset<=1;rowoffset++)
-            {
-                for(int coloffset=-1;coloffset<=1;coloffset++)
-                {
-                    int neighborRow =row+rowoffset;
-                    int neighborCol =col+coloffset;
-                    if(neighborRow>=0&&neighborRow<n&&neighborCol>=0&&neighborCol<n)
-                    {
-                        sum+=*(*(matrix+neighborRow)+neighborCol);
+    int **temp = (int **)malloc(n * sizeof(int *));
+    for (int i = 0; i < n; i++) {
+        temp[i] = (int *)malloc(n * sizeof(int));
+    }
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            int sum = 0, count = 0;
+            for (int rowOffset = -1; rowOffset <= 1; rowOffset++) {
+                for (int colOffset = -1; colOffset <= 1; colOffset++) {
+                    int r = row + rowOffset;
+                    int c = col + colOffset;
+                    if (r >= 0 && r < n && c >= 0 && c < n) {
+                        sum += *(*(matrix + r) + c);
                         count++;
                     }
                 }
             }
-           *(tempRow+col) = sum/count;
+            *(*(temp + row) + col) = sum / count;
         }
-    for(int col = 0;col<n;col++)
-    {
-       *(*(matrix+row)+col) = *(tempRow+col);
     }
+    for (int row = 0; row < n; row++) {
+        for (int col = 0; col < n; col++) {
+            *(*(matrix + row) + col) = *(*(temp + row) + col);
+        }
     }
-    free(tempRow);
+    for (int i = 0; i < n; i++) {
+        free(temp[i]);
+    }
+    free(temp);
 }
 int main() {
     int n;
@@ -85,6 +85,7 @@ int main() {
     printf("======================================\n");
     printf("\nEnter matrix size N (2 <= N <= 10): ");
     scanf("%d", &n);
+
     if (n < 2 || n > 10) {
         printf("Invalid input! N must be between 2 and 10.\n");
         return 1;
@@ -93,13 +94,14 @@ int main() {
     for (int i = 0; i < n; i++) {
         *(matrix + i) = (int *)malloc(n * sizeof(int));
     }
-    printf("\nWe will First Generate Random Sonar Image\n");
+
+    printf("\n1. Generating Random Sonar Image...");
     generateMatrix(matrix, n);
     displayMatrix(matrix, n, "Original Matrix (Sonar Intensity Values)");
-    printf("\nSecond we will Rotating Matrix 90 Clockwise\n");
+    printf("\n2. Rotating Matrix 90 Clockwise...");
     rotateMatrix90Clockwise(matrix, n);
     displayMatrix(matrix, n, "After 90 Clockwise Rotation");
-    printf("\n3rd we will Applying 3x3 Smoothing Filter\n");
+    printf("\n3. Applying 3x3 Smoothing Filter...");
     applySmoothingFilter(matrix, n);
     displayMatrix(matrix, n, "After Smoothing Filter");
     for (int i = 0; i < n; i++) {
