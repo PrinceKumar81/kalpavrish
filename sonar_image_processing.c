@@ -19,13 +19,11 @@ void displayMatrix(int **matrix, int n, const char *title) {
     }
 }
 void transposeMatrix(int **matrix, int n) {
-    for (int row = 0; row< n; row++) {
+    for (int row = 0; row < n; row++) {
         for (int col = row + 1; col < n; col++) {
-            int *ptr1 = *(matrix + row) + col;
-            int *ptr2 = *(matrix + col) + row;
-            int *temp = ptr1;
-            ptr1 = ptr2;
-            ptr2 = temp;
+            int temp = *(*(matrix + row) + col);
+            *(*(matrix + row) + col) = *(*(matrix + col) + row);
+            *(*(matrix + col) + row) = temp;
         }
     }
 }
