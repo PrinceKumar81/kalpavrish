@@ -9,6 +9,7 @@ typedef struct {
     int quantity;
 }product;
 // Functions
+void handleMenu(product **inventory,int *count);
 void addproduct(product **inventory,int *count);
 void viewallproduct(product *inventory,int count);
 void updateQuantity(product *inventory,int count);
@@ -17,25 +18,44 @@ void searchByName(product *inventory, int count);
 void searchByPriceRange(product *inventory, int count);
 void deleteProduct(product **inventory, int *count);
 void displayMenu();
+void initializeInventory(product **inventory,int *count);
 void clearInputBuffer();
 int isUniqueId(product *inventory, int count, int id); 
 int main()
 {
     product *inventory = NULL;
     int count=0;
-    int choice;
-    //Step1->asking number of Product from User
+    initializeInventory(&inventory, &count);
+    handleMenu(&inventory, &count);
+    return 0;
+}
+void initializeInventory(product **inventory,int *count)
+{
+    while(1){
     printf("Enter initial number of product ");
-    scanf("%d",&count);
+    scanf("%d",count);
     clearInputBuffer();
-
-    inventory = (product *)calloc(count,sizeof(product));
+    if(*count<0)
+    {
+        printf("Number of product cannot be negative.Try again\n");
+    }
+    else if(*count == 0)
+    {
+        printf("You entered 0-starting with an empty inventory\n");
+        *inventory=NULL;
+    }
+    else
+    {
+        break;
+    }
+}
+    *inventory = (product *)calloc(*count,sizeof(product));
     if(inventory == NULL)
     {
         printf("memory allocation failed,please try again");
-        return -1;
+        return;
     }
-    for(int i=0;i<count;i++)
+    for(int i=0;i<*count;i++)
     {
         printf("\nEnter the details of Product\n",i+1);
         int id;
@@ -44,57 +64,79 @@ int main()
             printf("Product ID : ");
             scanf("%d",&id);
             clearInputBuffer();
-
             if(id<=0)
             {
                 printf("Product Id Must be Greater than zero\n");
-            } else if(!isUniqueId(inventory,i,id))
+            } else if(!isUniqueId(*inventory,i,id))
             {
                 printf("Product Id already Exists,Try another Product Id\n");
             }else
             {
-                inventory[i].product_id=id;
+                (*inventory)[i].product_id=id;
                 break;
             }
         }
         printf("Product Name :");
-        fgets(inventory[i].product_name,60,stdin);
-        inventory[i].product_name[strcspn(inventory[i].product_name,"\n")]='\0';
-
-        while(1){
-            printf("Product price : ");
-            scanf("%f",&inventory[i].price);
-            if(inventory[i].price==0)
-            {
-                printf("Price cannot be zero of any Product,Re-enter it");
-            }
-            else if(inventory[i].price<0)
-            {
-                 printf("Price cannot be less than zero of any Product,Re-enter it\n");
-            }
-            else
-            {
-                break;
-            }
-        }
-        while(1)
-        {
-            printf("Product Quantity:");
-            scanf("%d",&inventory[i].quantity);
-            if(inventory[i].quantity==0)
-            {
-                printf("Quantity cannot be zero,Try again\n");
-            }
-            else if(inventory[i].quantity<0)
-            {
-                printf("Quantity cannot be less than Zero,Try again");
-            }
-            else
-            {
-                break;
-            }
+        fgets((*inventory)[i].product_name,60,stdin);
+        (*inventory)[i].product_name[strcspn((*inventory)[i].product_name,"\n")]='\0';
+        while (1) {
+    char input[100];
+    printf("Product price : ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0';
+    int valid = 1;
+    for (int j = 0; j < strlen(input); j++) {
+        if ((input[j] < '0' || input[j] > '9') && input[j] != '.') {
+            valid = 0;
+            break;
         }
     }
+    if (!valid) {
+        printf("Invalid input! Enter numeric values only.\n");
+        continue;
+    }
+    float price = strtof(input, NULL);
+    if (price <= 0) {
+        printf("Price must be greater than zero. Try again.\n");
+    } else if (price > 1000000) {
+        printf("Price too large! Please enter a value below 1,000,000.\n");
+    } else {
+        (*inventory)[i].price = price;
+        break;
+    }
+}
+ while (1) {
+    char input[100];
+    printf("Product Quantity: ");
+    fgets(input, sizeof(input), stdin);
+    input[strcspn(input, "\n")] = '\0';
+    int valid = 1;
+    for (int j = 0; j < strlen(input); j++) {
+        if (input[j] < '0' || input[j] > '9') {
+            valid = 0;
+            break;
+        }
+    }
+    if (!valid) {
+        printf("Invalid input! Enter whole numbers only.\n");
+        continue;
+    }
+    long qty = strtol(input, NULL, 10);
+    if (qty <= 0) {
+        printf("Quantity must be greater than zero. Try again.\n");
+    } else if (qty > 1000000) {
+        printf("Quantity too large! Please enter a value below 1,000,000.\n");
+    } else {
+        (*inventory)[i].quantity = (int)qty;
+        break;
+    }
+}
+
+    }
+}
+void handleMenu(product **inventory,int *count)
+{
+    int choice;
     while(1)
     {
         displayMenu();
@@ -104,35 +146,34 @@ int main()
         switch(choice)
         {
             case 1:
-            addproduct(&inventory,&count);
+            addproduct(inventory,count);
             break;
             case 2:
-            viewallproduct(inventory,count);
+            viewallproduct(*inventory,*count);
             break;
             case 3:
-            updateQuantity(inventory,count);
+            updateQuantity(*inventory,*count);
             break;
             case 4:
-            searchbyId(inventory,count);
+            searchbyId(*inventory,*count);
             break;
             case 5:
-            searchByName(inventory,count);
+            searchByName(*inventory,*count);
             break;
             case 6:
-            searchByPriceRange(inventory,count);
+            searchByPriceRange(*inventory,*count);
             break;
             case 7:
-            deleteProduct(&inventory,&count);
+            deleteProduct(inventory,count);
             break;
             case 8:
             printf("\nMemeory Released Successfully");
             free(inventory);
-            return 0;
+            return ;
             default :
             printf("Invalid choice ,Again try it");
         }
     }
-    return 0;
 }
 void displayMenu()
 {
@@ -173,6 +214,7 @@ void addproduct(product **inventory ,int *count)
         printf("Product ID: ");
         scanf("%d", &id);
         clearInputBuffer();
+
         if (id <= 0) {
             printf("Product ID must be greater than zero. Try again.\n");
         } else if (!isUniqueId(*inventory, *count, id)) {
@@ -194,32 +236,58 @@ void addproduct(product **inventory ,int *count)
         }
     }
     while (1) {
+        char input[100];
         printf("Product Price: ");
-        scanf("%f", &(*inventory)[*count].price);
-        clearInputBuffer();
-
-        if ((*inventory)[*count].price == 0) {
-            printf("Price cannot be zero. Re-enter.\n");
-        } else if ((*inventory)[*count].price < 0) {
-            printf("Price cannot be less than zero. Re-enter.\n");
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = '\0';
+        int valid = 1, dotCount = 0;
+        for (int j = 0; j < strlen(input); j++) {
+            if (input[j] == '.') dotCount++;
+            else if (input[j] < '0' || input[j] > '9') {
+                valid = 0;
+                break;
+            }
+        }
+        if (!valid || dotCount > 1) {
+            printf("Invalid input! Enter numeric values only.\n");
+            continue;
+        }
+        float price = strtof(input, NULL);
+        if (price <= 0) {
+            printf("Price must be greater than zero. Try again.\n");
+        } else if (price > 1000000) {
+            printf("Price too large! Please enter a value below 1,000,000.\n");
         } else {
+            (*inventory)[*count].price = price;
             break;
         }
     }
     while (1) {
+        char input[100];
         printf("Product Quantity: ");
-        scanf("%d", &(*inventory)[*count].quantity);
-        clearInputBuffer();
-
-        if ((*inventory)[*count].quantity == 0) {
-            printf("Quantity cannot be zero. Try again.\n");
-        } else if ((*inventory)[*count].quantity < 0) {
-            printf("Quantity cannot be less than zero. Try again.\n");
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = '\0';
+        int valid = 1;
+        for (int j = 0; j < strlen(input); j++) {
+            if (input[j] < '0' || input[j] > '9') {
+                valid = 0;
+                break;
+            }
+        }
+        if (!valid) {
+            printf("Invalid input! Enter whole numbers only.\n");
+            continue;
+        }
+        long qty = strtol(input, NULL, 10);
+        if (qty <= 0) {
+            printf("Quantity must be greater than zero. Try again.\n");
+        } else if (qty > 1000000) {
+            printf("Quantity too large! Please enter a value below 1,000,000.\n");
         } else {
+            (*inventory)[*count].quantity = (int)qty;
             break;
         }
     }
-
     (*count)++;
     printf("Product added successfully!\n");
 }
@@ -266,7 +334,7 @@ void searchbyId(product *inventory,int count)
 {
     int id;
     int found = 0;
-    printf("\nEnter produxt Id to search:\n");
+    printf("\nEnter product Id to search:\n");
     scanf("%d",&id);
     clearInputBuffer();
 
@@ -296,33 +364,34 @@ void toLowerCase(char *str) {
             str[i] = str[i] + ('a' - 'A');
     }
 }
-void searchByName(product *inventory,int count)
+void searchByName(product *inventory, int count)
 {
     char searchName[60];
-    int found=0;
-
-    printf("\nEnter the Name to Search ");
-    fgets(searchName,60,stdin);
-    searchName[strcspn(searchName,"\n")]='\0';
+    int found = 0;
+    printf("\nEnter the Name to Search: ");
+    fgets(searchName, 60, stdin);
+    searchName[strcspn(searchName, "\n")] = '\0';
     toLowerCase(searchName);
-
-    printf("Product Found\n");
-    for(int i=0;i<count;i++)
+    for (int i = 0; i < count; i++)
     {
-        if(strstr(inventory[i].product_name,searchName)!=NULL)
+        char tempName[60];
+        strcpy(tempName, inventory[i].product_name);
+        toLowerCase(tempName);
+
+        if (strstr(tempName, searchName) != NULL)
         {
-            printf("Product Id:\n Name:%s || Price %.2f || Quantity %d\n",
-            inventory[i].product_id,
-            inventory[i].product_name,
-            inventory[i].price,
-            inventory[i].quantity
-            );
+            printf("Product Found:\n");
+            printf("Product ID: %d || Name: %s || Price: %.2f || Quantity: %d\n",
+                   inventory[i].product_id,
+                   inventory[i].product_name,
+                   inventory[i].price,
+                   inventory[i].quantity);
             found = 1;
         }
     }
-    if(!found)
+    if (!found)
     {
-        printf("No product Found with this name%s ",searchName);
+        printf("No product found with the name \"%s\".\n", searchName);
     }
 }
 void searchByPriceRange(product *inventory, int count) {
@@ -347,7 +416,6 @@ void searchByPriceRange(product *inventory, int count) {
             found = 1;
         }
     }
-    
     if (!found) {
         printf("No products found in the price range %.2f - %.2f\n", minPrice, maxPrice);
     }
@@ -364,7 +432,6 @@ void deleteProduct(product **inventory, int *count) {
             break;
         }
     }
-    
     if (found == -1) {
         printf("Product with ID %d not found!\n", id);
         return;
