@@ -436,9 +436,10 @@ void deleteProduct(product **inventory, int *count) {
         printf("Product with ID %d not found!\n", id);
         return;
     }
-    for (int i = found; i < *count - 1; i++) {
+    for (int i = found; i < *count - 1; i++) { 
         (*inventory)[i] = (*inventory)[i + 1];
     }
+    
     (*count)--;
     if (*count > 0) {
         *inventory = (product *)realloc(*inventory, (*count) * sizeof(product));
