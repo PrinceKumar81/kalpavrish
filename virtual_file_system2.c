@@ -86,7 +86,7 @@ int allocateBlock() {
     if (freeListHead == NULL) return -1;
 
     FreeBlock* block = freeListHead;
-    int blockIndex = block->blockIndex;
+    int blockIndex = block->blockIndex ;
 
     freeListHead = freeListHead->next ;
     if (freeListHead != NULL) {
