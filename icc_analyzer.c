@@ -398,7 +398,30 @@ void DisplayPlayer()
     printf("Total Players: %d\n", team->totalPlayers);
     printf("Average Batting Strike Rate: %.2f\n", team->averageBattingStrikeRate);
 }
+void calculateAverageStrikeRate(int teamIndex)
+{
+    float sum = 0.0f;
+    int count = 0;
 
+    PlayerNode *node = teamsAll[teamIndex].playerHead;
+
+    while (node != NULL)
+    {
+        int pIndex = node->playerIndex;
+
+        if (playersAll[pIndex].role == ROLE_BATSMAN ||
+            playersAll[pIndex].role == ROLE_ALL_ROUNDER)
+        {
+            sum += playersAll[pIndex].strikeRate;
+            count++;
+        }
+        node = node->next;
+    }
+    if (count > 0)
+        teamsAll[teamIndex].averageBattingStrikeRate = sum / count;
+    else
+        teamsAll[teamIndex].averageBattingStrikeRate = 0.0f;
+}
 void DisplayBYaverageStirke()
 {
     int orderArray[MAX_TEAMS];
@@ -604,8 +627,152 @@ void printMenu()
     printf("2. Display Teams by Average Batting Strike Rate\n");
     printf("3. Display Top K Players of a Specific Team by Role\n");
     printf("4. Display All Players of specific role Across All Teams by performance index\n");
-    printf("5. Exit\n");
+    printf("5. Add Player\n");
+    printf("6.,Exit\n");
     printf("Enter your choice: ");
+}
+void addPlayer()
+{
+    int teamId, role, runs, wickets;
+    float average, strike_rate, economy;
+    char name[MAX_NAME_LENGTH];
+    int result;
+
+    printf("\n-- Add a New Player --\n");
+    printf("Enter Team ID (1..%d): ", teamsCount);
+
+    result = scanf("%d", &teamId);
+
+    if (result != 1)
+    {
+        printf("Error: Please enter a valid integer.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+
+    if (!validateInput(teamId, 1, teamsCount))
+    {
+        printf("Error: Team ID must be between 1 and %d\n", teamsCount);
+        return;
+    }
+
+    int teamIndex = searchByTeam(teamId);
+    if (teamIndex == -1)
+    {
+        printf("Team not found.\n");
+        return;
+    }
+
+    printf("Player ID: ");
+    if (scanf("%d", &playersAll[playersCount].id) != 1 ||
+        playersAll[playersCount].id <= 0)
+    {
+        printf("Error: Invalid Player ID.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    for (int i = 0; i < playersCount; i++)
+    {
+        if (playersAll[i].id == playersAll[playersCount].id)
+        {
+            printf("Error: Player ID already exists.\n");
+            return;
+        }
+    }
+    printf("Name: ");
+    while (getchar() != '\n') {}
+    fgets(name, MAX_NAME_LENGTH, stdin);
+    name[strcspn(name, "\n")] = 0;
+    strncpy(playersAll[playersCount].name, name, MAX_NAME_LENGTH);
+
+    printf("Role (1-Batsman, 2-Bowler, 3-All-rounder): ");
+    if (scanf("%d", &role) != 1 || !validateInput(role, 1, 3))
+    {
+        printf("Error: Invalid role.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    playersAll[playersCount].role = (Role)role;
+
+    printf("Total Runs: ");
+    if (scanf("%d", &runs) != 1)
+    {
+        printf("Error reading runs.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    playersAll[playersCount].runs = runs;
+
+    printf("Batting Average: ");
+    if (scanf("%f", &average) != 1)
+    {
+        printf("Error reading average.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    playersAll[playersCount].average = average;
+
+    printf("Strike Rate: ");
+    if (scanf("%f", &strike_rate) != 1)
+    {
+        printf("Error reading strike rate.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    playersAll[playersCount].strikeRate = strike_rate;
+
+    printf("Wickets: ");
+    if (scanf("%d", &wickets) != 1)
+    {
+        printf("Error reading wickets.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    playersAll[playersCount].wickets = wickets;
+
+    printf("Economy Rate: ");
+    if (scanf("%f", &economy) != 1)
+    {
+        printf("Error reading economy.\n");
+        while (getchar() != '\n') {}
+        return;
+    }
+    playersAll[playersCount].economy = economy;
+    strncpy(playersAll[playersCount].teamName,
+            teamsAll[teamIndex].name,
+            MAX_NAME_LENGTH - 1);
+
+    playersAll[playersCount].performance =
+        computePerformance(&playersAll[playersCount]);
+
+    Team *team = &teamsAll[teamIndex];
+    insertPlayer(&team->playerHead, playersCount);
+    team->totalPlayers++;
+    if (playersAll[playersCount].role == ROLE_BATSMAN)
+    {
+        SortedByPerformance(&team->batsmanHead, playersCount);
+        team->batsmanCount++;
+    }
+    else if (playersAll[playersCount].role == ROLE_BOWLER)
+    {
+        SortedByPerformance(&team->bowlerHead, playersCount);
+        team->bowlerCount++;
+    }
+    else
+    {
+        SortedByPerformance(&team->allrounderHead, playersCount);
+        team->allrounderCount++;
+    }
+    calculateAverageStrikeRate(teamIndex);
+
+    printf("\nPlayer '%s' added successfully to Team %s!\n",
+           playersAll[playersCount].name,
+           team->name);
+
+    printf("Performance Index = %.2f\n",
+           playersAll[playersCount].performance);
+
+    playersCount++;
 }
 
 int main()
@@ -649,6 +816,10 @@ int main()
             DisplayAllPlayersByRole();
         }
         else if (choiceValue == 5)
+        {
+            addPlayer();
+        }
+        else if(choiceValue==6)
         {
             break;
         }
